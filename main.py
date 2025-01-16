@@ -58,7 +58,35 @@ class ControlGastos:
             print(f"Error inesperado: {e}")
     
     def run(self):
-        pass
+        while True:
+            print("#------GESTION DE GASTOS-------#")
+            print("1. Cargar datos")
+            print("2. Añadir gasto")
+            print("3. Ver datos")
+            print("4. Exportar datos")
+            print("5. Salir")
+
+            try:
+                eleccion = int(input("Elegir opcion: "))
+                if eleccion == 1:
+                    self.cargar_gastos()
+                elif eleccion == 2:
+                    self.anadir_gasto()
+                elif eleccion == 3:
+                    self.ver_gastos()
+                elif eleccion == 4:
+                    self.guardar_gastos()
+                elif eleccion == 5:
+                    print("Saliendo...")
+                    break
+                else:
+                    print("Elección inválida. Intentelo de nuevo...")
+            except ValueError:
+                print("Elección inválida. Introduce un número!")
+            except Exception as e:
+                print(f"Error inesperado. {e}")
+
+
              
 if __name__ == "__main__":
     programa = ControlGastos()
