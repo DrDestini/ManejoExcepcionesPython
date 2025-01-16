@@ -12,9 +12,11 @@ class ControlGastos:
             with open(nombre, "r") as fich:
                 for linea in fich:
                     lineaArgs = linea.strip().split('||')
-                    gasto = {'descripcion':lineaArgs[0], 'coste':lineaArgs[1]}
+                    gasto = {'descripcion':lineaArgs[0], 'coste':float(lineaArgs[1])}
                     if gasto not in self.gastos:
                         self.gastos.append(gasto)
+        except ValueError as e:
+            print(f"Error al leer el fichero. Datos corruptos.")
         except FileNotFoundError as e:
             print(f"El fichero {nombre} no ha sido encontrado:\n{e}")
         except Exception as e:
@@ -38,8 +40,11 @@ class ControlGastos:
             if not self.gastos:
                 raise ExcepcionVacio("Se han encontrado 0 items.")
             print("\nGastos:")
+            total = 0
             for i, gasto in enumerate(self.gastos):
                 print(f"{i}. {gasto['descripcion']}: {gasto['coste']:.2f}€")
+                total += gasto['coste']
+            print(f"--- TOTAL: {total:.2f}€ ---")
         except ExcepcionVacio as e:
             print(f"El libro de gastos está vacío: {e}")
         except Exception as e:
@@ -51,7 +56,7 @@ class ControlGastos:
             with open(nombre, "w") as fich:
                 for gasto in self.gastos:
                     fich.write(f"{gasto['descripcion']}||{gasto['coste']}")
-                print(f"Gastos guardados con exito en la direccion:\n{fich.name}")
+                print(f"Gastos guardados con exito en el fichero: {fich.name}")
         except IOError as e:
             print(f"Error de fichero: {e}")
         except Exception as e:
