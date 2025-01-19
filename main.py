@@ -1,7 +1,25 @@
+'''
+Excepciónes personalizadas que usaremos tanto cuando el array está vacío como cuando
+se intenta añadir un gasto negativo al sistem.
+'''
 class ExcepcionVacio(Exception):
     def __init__(self, mensaje):
         super().__init__(mensaje)
-        
+
+class ExcepcionNumPos(Exception):
+    def __init__(self, mensaje):
+        super().__init__(mensaje)
+
+'''
+Clase principal del programa, contiene el manejo de las siguientes excepciones:
+
+Excepciones Personalizadas - Las excepciones definidas anteriormente que usaremos en caso de que el array esté vacío o el gasto introducido sea negativo
+ValueError - Error que salta cuando se introduce un tipo de datos inválido
+FileNotFoundError - Cuando el fichero requerido no se encuentra
+IoError - Para los errores de entrada/salida de ficheros
+
+(Exception) - Para las excepciones no esperadas que puedan ocurrir durante la ejecución
+'''       
 class ControlGastos:
     def __init__(self):
         self.gastos = []
@@ -13,12 +31,17 @@ class ControlGastos:
                 for linea in fich:
                     lineaArgs = linea.strip().split('||')
                     gasto = {'descripcion':lineaArgs[0], 'coste':float(lineaArgs[1])}
+                    if(gasto['coste'] < 0):
+                        raise ExcepcionNumPos("El gasto no puede ser negativo")
                     if gasto not in self.gastos:
                         self.gastos.append(gasto)
+            print("Fichero cargado con éxito!")
+        except ExcepcionNumPos as e:
+            print(f"Error en los datos del fichero: {e}")
         except ValueError as e:
             print(f"Error al leer el fichero. Datos corruptos.")
         except FileNotFoundError as e:
-            print(f"El fichero {nombre} no ha sido encontrado:\n{e}")
+            print(f"El fichero {nombre} no ha sido encontrado: {e}")
         except Exception as e:
             print(f"Error inesperado: {e}")
       
@@ -27,9 +50,11 @@ class ControlGastos:
             descripcion = input("Introduce la descripción del gasto: ")
             coste = float(input("Introduce el coste: "))
             if coste < 0:
-                raise ValueError("El coste no puede ser negativo.")
+                raise ExcepcionNumPos("El gasto no puede ser negativo")
             self.gastos.append({"descripcion":descripcion, "coste":coste})
             print("Gasto añadido con éxito!")
+        except ExcepcionNumPos as e:
+            print(f"Error al introducir el gasto: {e}")
         except ValueError as e:
             print(f"Error: {e}")
         except Exception as e:
@@ -52,11 +77,15 @@ class ControlGastos:
             
     def guardar_gastos(self):
         try:
+            if not self.gastos:
+                raise ExcepcionVacio("Se han encontrado 0 items.")
             nombre = input("Introduce el nombre del archivo (ej: reporte.txt): ")
             with open(nombre, "w") as fich:
                 for gasto in self.gastos:
                     fich.write(f"{gasto['descripcion']}||{gasto['coste']}")
-                print(f"Gastos guardados con exito en el fichero: {fich.name}")
+                print(f"Gastos exportados con éxito en el fichero: {fich.name}")
+        except ExcepcionVacio as e:
+            print(f"No hay nada que exportar: {e}")
         except IOError as e:
             print(f"Error de fichero: {e}")
         except Exception as e:
@@ -86,13 +115,26 @@ class ControlGastos:
                     break
                 else:
                     print("Elección inválida. Intentelo de nuevo...")
+                
+                input("Pulsa [ENTER] para continuar...")
             except ValueError:
                 print("Elección inválida. Introduce un número!")
             except Exception as e:
                 print(f"Error inesperado. {e}")
 
+'''
+Casos a intentar:
 
-             
+(1) - Opcion inválida en el menú (ValueError)
+(2) - Cargar un fichero inexistende (FileNotFoundError)
+(3) - Ver gastos con array vacio (ExcepcionVacio)
+(4) - Introducir un gasto con coste no numerico (ValueError)
+(5) - Introducir un gasto con coste negativo (ExcepcionNumPos)
+(6) - Modificar un fichero guardado e intentar cargar un fichero corrupto (ValueError)
+(7) - Modificar el fichero con un gasto negativo (ExcepcionNumPos)
+
+'''
+
 if __name__ == "__main__":
     programa = ControlGastos()
     programa.run()
